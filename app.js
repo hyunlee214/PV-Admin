@@ -6,12 +6,11 @@ const logger = require('morgan');
 const session = require("express-session");
 const { sequelize } = require("./models");
 
+const adminAPI = require("./routes/admin");
+
 const app = express();
 sequelize.sync();
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
 app.use(express.json());

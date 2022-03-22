@@ -1,4 +1,4 @@
-const resp = require("../service/response");
+const resp = require("../services/response");
 
 const {
   User,
