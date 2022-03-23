@@ -1,4 +1,5 @@
 const resp = require("../services/response");
+const { StringHash } = require("../services/hashing");
 
 const {
   User,
@@ -29,7 +30,7 @@ const Join = async (req, res, next) => {
     };
     user = await User.create({
       AdminId,
-      password,
+      password: StringHash(password),
     });
     if (user) {
       return resp(res, 200, { msg: "가입 완료" });
@@ -50,7 +51,7 @@ const Login = async (req, res, next) => {
     if (!user) {
       return resp(res, 400, { msg: "일치하는 계정을 찾을 수 없습니다" });
     }
-    if (user.password === password) {
+    if (user.password === StringHash(password)) {
       req.session.AdminId = AdminId;
       return resp(res, 200, { msg: "로그인 성공" });
     }
@@ -111,7 +112,11 @@ const CreateRecruit = async (req, res, next) => {
 };
 
 const ReadRecruit = async (req, res, next) => {
+  const { AdminId } = req.session;
   try {
+    if (typeof AdminId === "undefined") {
+      return resp(res, 401, { msg: "권한이 없습니다" });
+    }
   const recruits = await Recruit.findAll({});
   return resp(res, 200, recruits);
   } catch (e) {
@@ -168,7 +173,11 @@ const UpdateRecruit = async (req, res, next) => {
 
 const DeleteRecruit = async (req, res, next) => {
   const { id } = req.body;
-  try {
+  const { AdminId } = req.session; 
+  try { 
+    if (typeof AdminId === "undefined") {
+      return resp(res, 401, { msg: "권한이 없습니다" });
+    }
     const existRecruit = await Recruit.findOne({ where: { id } });
     if (!existRecruit) {
       return resp(res, 400, { msg: "존재하지 않는 채용공고 입니다" });
@@ -223,7 +232,12 @@ const CreateNewsRoom = async (req, res, next) => {
 };
 
 const ReadNewsRoom = async (req, res, next) => {
+  const { AdminId } = req.session;
+
   try {
+  if (typeof AdminId === "undefined") {
+    return resp(res, 401, { msg: "권한이 없습니다" });
+  }
   const newsrooms = await NewsRoom.findAll({});
   return resp(res, 200, newsrooms);
   } catch (e) {
@@ -278,8 +292,12 @@ const UpdateNewsRoom = async (req, res, next) => {
 
 const DeleteNewsRoom = async (req, res, next) => {
   const { id } = req.params;
+  const { AdminId } = req.session;
   
   try {
+    if (typeof AdminId === "undefined") {
+      return resp(res, 401, { msg: "권한이 없습니다" });
+    }
     const existNewsRoom = await NewsRoom.findOne({ where: { id } });
     if (!existNewsRoom) {
       return resp(res, 400, { msg: "존재하지 않는 뉴스룸입니다" });
@@ -358,7 +376,6 @@ const DeleteClientImage = async (req, res, next) => {
     return next(e);
   }
 };
-
 
 
 module.exports = {
