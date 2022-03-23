@@ -16,7 +16,9 @@ const {
   ReadClientImage,
   DeleteClientImage,
 } = require("../api/admin");
-const { newsRoomFileUpload } = require("../services/upload");
+const { newsRoomFileUpload, 
+        clientImageFileUpload 
+      } = require("../services/upload");
 
 router
 
@@ -40,7 +42,7 @@ router
     await ReadRecruit(req, res, next);
   })
 
-  .post("/UpdateRecruit", async (req, res, next) => {
+  .post("/UpdateRecruit/:id", async (req, res, next) => {
     await UpdateRecruit(req, res, next);
   })
 
@@ -56,15 +58,15 @@ router
     await ReadNewsRoom(req, res, next);
   })
 
-  .post("/UpdateNewsRoom", newsRoomFileUpload, async (req, res, next) => {
+  .post("/UpdateNewsRoom/:id", newsRoomFileUpload, async (req, res, next) => {
     await UpdateNewsRoom(req, res, next);
   })
 
-  .post("/DeleteNewsRoom", async (req, res, next) => {
+  .post("/DeleteNewsRoom/:id", async (req, res, next) => {
     await DeleteNewsRoom(req, res, next);
   })
 
-  .post("/CreateClientImage", async (req, res, next) => {
+  .post("/CreateClientImage", clientImageFileUpload, async (req, res, next) => {
     await CreateClientImage(req, res, next);
   })
 

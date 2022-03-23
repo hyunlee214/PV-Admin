@@ -129,8 +129,12 @@ const UpdateRecruit = async (req, res, next) => {
     content,
   } = req.body;
   const { id } = req.params;
+  const { AdminId } = req.session;
 
   try {
+    if (typeof AdminId === "undefined") {
+      return resp(res, 401, { msg: "권한이 없습니다" });
+    }
     const existRecruit = await Recruit.findOne({ where: { id } });
     if (!existRecruit) {
       return resp(res, 400, { msg: "존재하지 않는 채용공고 글 입니다" });
@@ -292,19 +296,23 @@ const DeleteNewsRoom = async (req, res, next) => {
 
 // 협력사 기능 (CRD)
 const CreateClientImage = async (req, res, next) => {
-  const { originalname, filename, size } = req.file;
   const { AdminId } = req.session;
+  const { files } = req;
   try {
     if (typeof AdminId === "undefined") {
       return resp(res, 401, { msg: "권한이 없습니다" });
     }
-    const [created] = await ClientImage.create({
-      originalname: originalname,
-      filename: `/upload/${filename}`,
-      size,
+    
+    const clientImage = files.map(async (file) => {
+      const { originalname, filename, size } = file;
+       await ClientImage.create({
+        originalname,
+        filename: `/upload/${filename}`,
+        size,
+      });
     });
-    if (created) {
-      return resp(res, 200, { msg: "협력사 이미지 등록 완료" });
+    if (clientImage) {
+      return resp(res, 200, { msg: "협력사 이미지 생성 완료" });
     }
     return resp(res, 404, { msg: "잘못된 접근입니다" });
   } catch (e) {
@@ -327,7 +335,14 @@ const ReadClientImage = async (req, res, next) => {
 
 const DeleteClientImage = async (req, res, next) => {
   const { AdminId } = req.session;
+  const { id } = req.body;
   try {
+    if (typeof AdminId === "undefined") {
+      return resp(res, 401, { msg: "권한이 없습니다" });
+    }
+    if (!id) {
+      return resp(res, 400, { msg: "삭제할 협력사를 선택해 주세요" });
+    }
     const existClientImage = await ClientImage.findOne({
       where: { id },
     });

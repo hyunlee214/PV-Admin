@@ -17,8 +17,13 @@ const newsRoomFileUpload = multer({
   limits: { fileSize: 10 * MB },
 }).array("imageList");
 
+const clientImageFileUpload = multer({
+  storage,
+  limits: { fileSize: 10 * MB },
+}).array("imageList");
 
 
 module.exports = { 
   newsRoomFileUpload,
+  clientImageFileUpload,
 };

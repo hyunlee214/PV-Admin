@@ -29,6 +29,10 @@ fs.readdirSync(__dirname)
   });
 
 db.User = require("./user")(sequelize, Sequelize);
+db.Recruit = require("./recruit")(sequelize, Sequelize);
+db.NewsRoom = require("./newsRoom")(sequelize, Sequelize);
+db.NewsRoomFile = require("./newsRoomFile")(sequelize, Sequelize);
+db.ClientImage = require("./clientImage")(sequelize, Sequelize);
 
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {
