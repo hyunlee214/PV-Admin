@@ -3,6 +3,8 @@ const resp = require("../services/response");
 const {
   User,
   Recruit,
+  NewsRoom,
+  NewsRoomFile,
   Sequelize: { Op },
 } = require("../models");
 
@@ -77,6 +79,7 @@ const CreateRecruit = async (req, res, next) => {
     content,
   } = req.body;
   const { AdminId } = req.session;
+
   try {
     if (typeof AdminId === "undefined") {
       return resp(res, 401, { msg: "권한이 없습니다" });
@@ -96,6 +99,7 @@ const CreateRecruit = async (req, res, next) => {
       tag,
       content,
     });
+
     if (recruit) {
       return resp(res, 200, { msg: "생성 완료" });
     }
@@ -174,6 +178,118 @@ const DeleteRecruit = async (req, res, next) => {
   }
 };
 
+// 뉴스룸 등록
+const CreateNewsRoom = async (req, res, next) => {
+  const { title, content } = req.body;
+  const { files } = req;
+  const { AdminId } = req.session;
+
+  try { 
+    if (typeof AdminId === "undefined") {
+      return resp(res, 401, { msg: "권한이 없습니다" });
+    }
+    if (!title || !content) {
+      return resp(res, 400, { msg: "빈칸을 채워주세요" });
+    }
+    if (!title.length > 128) {
+      return resp(res, 400, { msg: "글자수를 적당히 맞춰 주세요" });
+    }
+
+    const newsRoom = await NewsRoom.create({
+      title,
+      content,
+    });
+    
+    files.map(async (file) => {
+      const { originalname, filename, size } = file;
+      await NewsRoomFile.create({
+        originalname,
+        filename: `/upload/${filename}`,
+        size,
+      });
+    });
+    if (newsRoom) {
+      return resp(res, 200, { msg: "생성 완료" });
+    }
+    return resp(res, 404, { msg: "잘못된 접근입니다" });
+  } catch (e) {
+    return next(e);
+  }
+};
+
+const ReadNewsRoom = async (req, res, next) => {
+  try {
+  const newsrooms = await NewsRoom.findAll({});
+  return resp(res, 200, newsrooms);
+  } catch (e) {
+    return next(e);
+  }
+};
+
+const UpdateNewsRoom = async (req, res, next) => {
+  const { title, content } = req.body;
+  const { id } = req.params;
+  const { files } = req;
+  const { AdminId } = req.session;
+
+  try {
+    if (typeof AdminId === "undefined") {
+      return resp(res, 401, { msg: "권한이 없습니다" });
+    }
+
+    const existNewsRoom = await NewsRoom.findOne({ where: { id } });
+    if (!existNewsRoom) {
+      return resp(res, 403, { msg: "존재하지 않는 뉴스룸입니다" });
+    }
+
+    const prevFile = await NewsRoomFile.findAll({ where: { newsRoomId: id } });
+    prevFile.forEach(async (file) => {
+      await NewsRoomFile.destroy({ where: { filename: file.filename } });
+    });
+
+    if (typeof files !== "undefined") {
+      files.map(async (file) => {
+        const { originalname, filename, size } = file;
+        await NewsRoomFile.create({
+          originalname,
+          filename: `/upload/${filename}`,
+          size,
+        });
+      });
+    }
+    
+    const [updated] = await NewsRoom.update({
+      title,
+      content,
+    }, { where: { id } });
+    if (updated) {
+      return resp(res, 200, { msg: "업데이트 완료" });
+    }
+    return resp(res, 404, { msg: "잘못된 접근입니다" });
+  } catch (e) {
+    return next(e);
+  }
+};
+
+const DeleteNewsRoom = async (req, res, next) => {
+  const { id } = req.params;
+  
+  try {
+    const existNewsRoom = await NewsRoom.findOne({ where: { id } });
+    if (!existNewsRoom) {
+      return resp(res, 400, { msg: "존재하지 않는 뉴스룸입니다" });
+    }
+    const deleted = await NewsRoom.destroy({ where: { id } });
+    if (deleted) {
+      return resp(res, 200, { msg: "삭제 완료" });
+    }
+    return resp(res, 404, { msg: "잘못된 접근입니다" });
+  } catch (e) {
+    return next(e);
+  }
+};
+
+
 
 module.exports = {
   Join,
@@ -183,4 +299,8 @@ module.exports = {
   ReadRecruit,
   UpdateRecruit,
   DeleteRecruit,
+  CreateNewsRoom,
+  ReadNewsRoom,
+  UpdateNewsRoom,
+  DeleteNewsRoom,
 }
