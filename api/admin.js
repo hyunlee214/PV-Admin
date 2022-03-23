@@ -5,6 +5,7 @@ const {
   Recruit,
   NewsRoom,
   NewsRoomFile,
+  ClientImage,
   Sequelize: { Op },
 } = require("../models");
 
@@ -289,6 +290,27 @@ const DeleteNewsRoom = async (req, res, next) => {
   }
 };
 
+// 협력사 기능 (CRD)
+const CreateClientImage = async (req, res, next) => {
+  const { originalname, filename, size } = req.file;
+  const { AdminId } = req.session;
+  try {
+    if (typeof AdminId === "undefined") {
+      return resp(res, 401, { msg: "권한이 없습니다" });
+    }
+    const [created] = await ClientImage.create({
+      originalname: originalname,
+      filename: `/upload/${filename}`,
+      size,
+    });
+    if (created) {
+      return resp(res, 200, { msg: "협력사 이미지 등록 완료" });
+    }
+    return resp(res, 404, { msg: "잘못된 접근입니다" });
+  } catch (e) {
+    return next(e);
+  }
+};
 
 
 module.exports = {
@@ -303,4 +325,5 @@ module.exports = {
   ReadNewsRoom,
   UpdateNewsRoom,
   DeleteNewsRoom,
+  CreateClientImage,
 }
