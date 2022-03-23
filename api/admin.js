@@ -312,6 +312,39 @@ const CreateClientImage = async (req, res, next) => {
   }
 };
 
+const ReadClientImage = async (req, res, next) => {
+  const { AdminId } = req.session;
+  try {
+    if (typeof AdminId === "undefined") {
+      return resp(res, 401, { msg: "권한이 없습니다" });
+    }
+    const clientImages = await ClientImage.findAll({});
+    return resp(res, 200, clientImages);
+  } catch (e) {
+    return next(e);
+  }
+};
+
+const DeleteClientImage = async (req, res, next) => {
+  const { AdminId } = req.session;
+  try {
+    const existClientImage = await ClientImage.findOne({
+      where: { id },
+    });
+    if (!existClientImage) {
+      return resp(res, 400, { msg: "존재하지 않는 협력사 이미지입니다" });
+    }
+    const deleted = await ClientImage.destroy({ where: { id } });
+    if (deleted) {
+      return resp(res, 200, { msg : "협력사 이미지 삭제 완료" });
+    }
+    return resp(res, 404, { msg: "잘못된 접근입니다" });
+  } catch (e) {
+    return next(e);
+  }
+};
+
+
 
 module.exports = {
   Join,
@@ -326,4 +359,6 @@ module.exports = {
   UpdateNewsRoom,
   DeleteNewsRoom,
   CreateClientImage,
+  ReadClientImage,
+  DeleteClientImage,
 }
