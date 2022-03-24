@@ -16,7 +16,7 @@ module.exports = (queryInterface, Sequelize) => {
     }
   );
   newsRoom.associate = (models) => {
-    newsRoom.hasMany(models.newsRoomFile, {
+    newsRoom.hasMany(models.NewsRoomFile, {
       foreignKey: "newsRoomId",
       sourceKey: "id",
     });

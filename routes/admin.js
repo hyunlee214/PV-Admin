@@ -59,7 +59,7 @@ router
     await CreateNewsRoom(req, res, next);
   })
 
-  .get("/ReadNewsRoom", async (req, res, next) => {
+  .post("/ReadNewsRoom", async (req, res, next) => {
     await ReadNewsRoom(req, res, next);
   })
 

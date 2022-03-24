@@ -247,6 +247,7 @@ const CreateNewsRoom = async (req, res, next) => {
         originalname,
         filename: `/upload/${filename}`,
         size,
+        newsRoomId: newsRoom.id,
       });
     });
     if (newsRoom) {
@@ -265,8 +266,18 @@ const ReadNewsRoom = async (req, res, next) => {
   if (typeof AdminId === "undefined") {
     return resp(res, 401, { msg: "권한이 없습니다" });
   }
-  const newsrooms = await NewsRoom.findAll({});
-  return resp(res, 200, newsrooms);
+  const newsrooms = await NewsRoom.findAll({
+    include: [
+      {
+        model: NewsRoomFile,
+        attributes: ["originalname", "filename"],
+      },
+    ],
+  });
+  if (newsrooms) {
+      return resp(res, 200, newsrooms);
+    }
+    return resp(res, 404, { msg: "잘못된 접근입니다" });
   } catch (e) {
     return next(e);
   }

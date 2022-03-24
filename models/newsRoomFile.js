@@ -20,10 +20,10 @@ module.exports = (queryInterface, Sequelize) => {
     }
   );
   newsRoomFile.associate = (models) => {
-    newsRoomFile.belongsTo(models.newsRoom, {
+    newsRoomFile.belongsTo(models.NewsRoom, {
       foreignKey: "newsRoomId",
       sourceKey: "id",
     });
   };
   return newsRoomFile;
-}
+};
