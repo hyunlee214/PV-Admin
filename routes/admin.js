@@ -4,6 +4,7 @@ const {
   Join,
   Login,
   Logout,
+  DeleteAdmin,
   CreateRecruit,
   ReadRecruit,
   UpdateRecruit,
@@ -32,6 +33,10 @@ router
 
   .get("/Logout", async (req, res, next) => {
     await Logout(req, res, next);
+  })
+
+  .post("/DeleteAdmin", async (req, res, next) => {
+    await DeleteAdmin(req, res, next);
   })
 
   .post("/CreateRecruit", async (req, res, next) => {

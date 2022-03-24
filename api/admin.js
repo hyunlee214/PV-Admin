@@ -70,6 +70,33 @@ const Logout = (req, res, next) => {
   }
 };
 
+// 관리자 탈퇴
+const DeleteAdmin = async (req, res, next) => {
+  const { id } = req.body;
+  const { AdminId } = req.session;
+  try {
+    if (typeof AdminId === "undefined") {
+      return resp(res, 401, { msg: "권한이 없습니다" });
+    }
+    if (!id) {
+      return resp(res, 400, { msg: "탈퇴할 관리자를 선택해 주세요" });
+    }
+    const existUser = await User.findOne({
+      where: { id },
+    });
+    if (!existUser) {
+      return resp(res, 400, { msg: "존재하지 않는 관리자입니다"});
+    }
+    const deleted = await User.destroy({ where: { id } });
+    if (deleted) {
+      return resp(res, 200, { msg: "관리자 탈퇴 완료" });
+    }
+    return resp(res, 404, { msg: "잘못된 접근입니다" });
+  } catch (e) {
+    return next(e);
+  }
+}
+
 // 채용 공고글 등록
 const CreateRecruit = async (req, res, next) => {
   const {
@@ -382,6 +409,7 @@ module.exports = {
   Join,
   Login,
   Logout,
+  DeleteAdmin,
   CreateRecruit,
   ReadRecruit,
   UpdateRecruit,
