@@ -13,13 +13,14 @@ const adminAPI = require("./routes/admin");
 const app = express();
 sequelize.sync();
 
-app.use(cors({ origin: "*", credentials: true } ));
+app.use(cors({ origin: true, credentials: true } ));
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use("/upload", express.static(path.join(__dirname, "upload")));
 
 
 app.use(

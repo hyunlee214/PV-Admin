@@ -7,10 +7,12 @@ const {
   DeleteAdmin,
   CreateRecruit,
   ReadRecruit,
+  ReadRecruitOne,
   UpdateRecruit,
   DeleteRecruit,
   CreateNewsRoom,
   ReadNewsRoom,
+  ReadNewsRoomOne,
   UpdateNewsRoom,
   DeleteNewsRoom,
   CreateClientImage,
@@ -47,6 +49,10 @@ router
     await ReadRecruit(req, res, next);
   })
 
+  .get("/ReadRecruitOne/:id", async(req,res,next) => {
+    await ReadRecruitOne(req, res, next);
+  })
+
   .post("/UpdateRecruit/:id", async (req, res, next) => {
     await UpdateRecruit(req, res, next);
   })
@@ -61,6 +67,10 @@ router
 
   .post("/ReadNewsRoom", async (req, res, next) => {
     await ReadNewsRoom(req, res, next);
+  })
+
+  .get("/ReadNewsRoomOne/:id", async(req,res,next) => {
+    await ReadNewsRoomOne(req, res, next);
   })
 
   .post("/UpdateNewsRoom/:id", newsRoomFileUpload, async (req, res, next) => {

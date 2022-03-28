@@ -151,6 +151,26 @@ const ReadRecruit = async (req, res, next) => {
   }
 };
 
+const ReadRecruitOne = async (req,res,next) => {
+  const { id } = req.params;
+  const { AdminId } = req.session;
+
+  try {
+    if (typeof AdminId === "undefined") {
+      return resp(res, 401, { msg: "권한이 없습니다" });
+    }
+    const recruit = await Recruit.findOne({
+      where: { id },
+    });
+    if (recruit) {
+      return resp(res, 200, recruit);
+    }
+    return resp(res, 400, { msg: "잘못된 접근입니다" });
+  } catch (e) {
+    return next(e);
+  }
+}
+
 const UpdateRecruit = async (req, res, next) => {
   const {
     type,
@@ -225,6 +245,8 @@ const CreateNewsRoom = async (req, res, next) => {
   const { files } = req;
   const { AdminId } = req.session;
 
+  console.log(files);
+
   try { 
     if (typeof AdminId === "undefined") {
       return resp(res, 401, { msg: "권한이 없습니다" });
@@ -255,6 +277,7 @@ const CreateNewsRoom = async (req, res, next) => {
     }
     return resp(res, 404, { msg: "잘못된 접근입니다" });
   } catch (e) {
+    console.error(e)
     return next(e);
   }
 };
@@ -282,6 +305,32 @@ const ReadNewsRoom = async (req, res, next) => {
     return next(e);
   }
 };
+
+const ReadNewsRoomOne = async (req, res, next) => {
+  const { id } = req.params;
+  const { AdminId } = req.session;
+
+  try {
+    if (typeof AdminId === "undefined") {
+      return resp(res, 401, { msg: "권한이 없습니다" });
+    }
+    const newsroom = await NewsRoom.findOne({
+      where: { id },
+      include: [
+        {
+          model: NewsRoomFile,
+          attributes: ["originalname", "filename"],
+        },
+      ],
+    });
+    if (newsroom) {
+      return resp(res, 200, newsroom);
+    }
+    return resp(res, 400, { msg: "잘못된 접근입니다" });
+  } catch (e) {
+    return next(e);
+  }
+}
 
 const UpdateNewsRoom = async (req, res, next) => {
   const { title, content } = req.body;
@@ -423,10 +472,12 @@ module.exports = {
   DeleteAdmin,
   CreateRecruit,
   ReadRecruit,
+  ReadRecruitOne,
   UpdateRecruit,
   DeleteRecruit,
   CreateNewsRoom,
   ReadNewsRoom,
+  ReadNewsRoomOne,
   UpdateNewsRoom,
   DeleteNewsRoom,
   CreateClientImage,
