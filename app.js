@@ -9,6 +9,7 @@ const cors = require("cors");
 const { sequelize } = require("./models");
 
 const adminAPI = require("./routes/admin");
+const mainAPI = require("./routes/main");
 
 const app = express();
 sequelize.sync();
@@ -36,6 +37,7 @@ app.use(
 );
 
 app.use("/api/admin", adminAPI);
+app.use("/api/main", mainAPI);
 
 // error handler
 app.use(

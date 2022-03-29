@@ -64,6 +64,7 @@ const Login = async (req, res, next) => {
 const Logout = (req, res, next) => {
   try {
     req.session.destroy();
+    res.status(200).clearCookie('connect.sid', {path: '/'});
     return resp(res, 200, { msg: "로그아웃 성공" });
   } catch (e) {
     return next(e);
@@ -182,6 +183,8 @@ const UpdateRecruit = async (req, res, next) => {
   } = req.body;
   const { id } = req.params;
   const { AdminId } = req.session;
+
+  console.log(req.body)
 
   try {
     if (typeof AdminId === "undefined") {
@@ -360,6 +363,7 @@ const UpdateNewsRoom = async (req, res, next) => {
           originalname,
           filename: `/upload/${filename}`,
           size,
+          newsRoomId: id,
         });
       });
     }
